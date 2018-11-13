@@ -1,0 +1,70 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+
+@TeleOp(name="Drive", group="Main")
+public class Drive extends LinearOpMode
+{
+    DcMotor leftMotor, rightMotor, midMotor, liftMotor;
+    Servo liftServo;
+    float   leftY, rightY, left_trigger, right_trigger, leftY2, rightX2;
+    boolean left_bumper, right_bumper;
+
+    //Called when initiation button is pressed.
+    @Override
+    public void runOpMode()
+    {
+        leftMotor = hardwareMap.dcMotor.get("left_motor");
+        rightMotor = hardwareMap.dcMotor.get("right_motor");
+        midMotor = hardwareMap.dcMotor.get("mid_motor");
+        liftMotor = hardwareMap.dcMotor.get("lift_motor");
+        liftServo = hardwareMap.servo.get("lift_servo");
+
+        rightMotor.setDirection(DcMotor.Direction.REVERSE);
+        midMotor.setDirection(DcMotor.Direction.REVERSE);
+
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+        // Wait for the game to start (driver presses INIT)
+        waitForStart();
+
+        // Run until the end of the match (driver presses STOP)
+        while (opModeIsActive())
+        {
+            leftY = gamepad1.left_stick_y;
+            rightY = gamepad1.right_stick_y;
+            left_trigger = gamepad1.left_trigger;
+            right_trigger = gamepad1.right_trigger;
+            leftY2 = gamepad2.left_stick_y;
+            rightX2 = gamepad2.right_stick_x;
+            left_bumper = gamepad2.left_bumper;
+            right_bumper = gamepad2.right_bumper;
+
+            leftMotor.setPower(leftY);
+            rightMotor.setPower(rightY);
+            midMotor.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
+            liftMotor.setPower(leftY2);
+
+            //Servo Controls
+            if (left_bumper) {
+                //Opens Servo
+                liftServo.setPosition(0.65);
+            } else if (right_bumper) {
+                //Closes Servo
+                liftServo.setPosition(0.16);
+            }
+        }
+
+            telemetry.addData("Status", "Running");
+            telemetry.addData("Sticks", "  left=" + leftY + "  right=" + rightY);
+            telemetry.addData("Triggers", "  left=" + left_trigger + "  right=" + right_trigger);
+            telemetry.addData("Lift", leftY2);
+            telemetry.addData("Servo", rightX2);
+            telemetry.update();
+
+            idle();
+        }
+    }
